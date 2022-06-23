@@ -27,14 +27,25 @@ function App() {
       await fetch(`http://localhost:3001/tasks/${id}`, {
         method: 'DELETE'
       });
+      setTasks(tasks.filter(task => (task.id !== id)));
     } catch(err) {
       console.log(err);
     }
-    setTasks(tasks.filter(task => (task.id !== id)))
   }
 
   async function setReminder(id) {
-    setTasks(tasks.map(task => task.id === id ? {...task, reminder: !task.reminder} : task))
+    try {
+      const task = await fetch(`http://localhost:3001/tasks/${id}`);
+      const taskData = await task.json();
+      await fetch(`http://localhost:3001/tasks/${id}`, {
+        method: 'PUT', 
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({ ...taskData, reminder : !taskData.reminder })
+      });
+      setTasks(tasks.map(task => task.id === id ? {...task, reminder: !task.reminder} : task));
+    } catch(err) {
+      console.log(err);
+    }
   }
 
   async function addTask(task) {
@@ -45,7 +56,6 @@ function App() {
         body: JSON.stringify(task)
       }); // JSON server responds with new entry
       const newTask = await res.json(); 
-      console.log(newTask);
       setTasks([...tasks, newTask])
     } catch(err) {
       console.log(err);
