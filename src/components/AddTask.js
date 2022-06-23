@@ -21,6 +21,8 @@ const AddTask = ({addTask}) => {
         setReminder(false);
         const newId = Math.random() * (9999 - 4) + 4;
         addTask({id: newId, text, day, reminder});
+        textInput.current.classList.remove('error');
+        dayInput.current.classList.remove('error');
     }
      
     return(
